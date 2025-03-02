@@ -1,26 +1,43 @@
-# Muffet Viewer
+# Weekly Music App
 
-A React application that displays songs added to a shared Spotify playlist, organized by week and contributor.
+A React application to display weekly music additions to a Spotify playlist.
 
 ## Setup
 
-1. Install dependencies:
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/repo-name.git
+cd repo-name
+```
+
+2. Install dependencies
 ```bash
 npm install
 ```
 
-2. Create a `.env` file in the root directory with the following variables:
-```
-REACT_APP_SPOTIFY_CLIENT_ID=your_client_id
-REACT_APP_SPOTIFY_CLIENT_SECRET=your_client_secret
-REACT_APP_PLAYLIST_ID=your_playlist_id
-```
+3. Create a `.env` file based on `.env.example` and add your Spotify credentials:
+- Get your Spotify API credentials from [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+- Add your playlist ID from the Spotify playlist URL
 
-3. Start the development server:
+4. Start the development server
 ```bash
 npm start
 ```
-4. Open [http://localhost:3000](http://localhost:3000) to view the app in your browser.
+
+## Deployment
+
+To deploy to GitHub Pages:
+```bash
+npm run deploy
+```
+
+## Environment Variables
+
+The following environment variables are required:
+
+- `REACT_APP_SPOTIFY_CLIENT_ID`: Your Spotify API client ID
+- `REACT_APP_SPOTIFY_CLIENT_SECRET`: Your Spotify API client secret
+- `REACT_APP_PLAYLIST_ID`: The ID of your Spotify playlist
 
 ## Features
 

@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 
 const SongCard = ({ song, member, memberId, onMemberClick, onArtistClick }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = React.useRef(null);
-
   const getGenreClass = (genre) => {
     return genre?.toLowerCase().replace(/[^a-z]/g, '-') || '';
   };
@@ -24,28 +21,9 @@ const SongCard = ({ song, member, memberId, onMemberClick, onArtistClick }) => {
     window.open(song.spotifyUrl, '_blank');
   };
 
-  const primaryGenre = song.genres[0];
+  // Only try to get genre if song exists
+  const primaryGenre = song?.genres?.[0];
   const genreClass = getGenreClass(primaryGenre);
-
-  const togglePlay = (e) => {
-    e.stopPropagation();
-    if (!song.previewUrl) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleAudioEnd = () => {
-    setIsPlaying(false);
-  };
-
-  if (!song) {
-    return null; // We're not showing empty cards anymore
-  }
 
   return (
     <div className="song-card" data-genre={genreClass}>

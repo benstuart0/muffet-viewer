@@ -60,12 +60,9 @@ class SpotifyService {
       }
 
       allTracks = [...allTracks, ...data.items];
-      nextUrl = data.next; // Spotify provides the next page URL, null when no more pages
+      nextUrl = data.next;
     }
 
-    console.log(`Retrieved ${allTracks.length} total tracks`);
-
-    // After getting tracks, fetch artist details to get genres
     const artistIds = [...new Set(allTracks.map(item => item.track.artists[0].id))];
     const artistGenres = await this.getArtistGenres(artistIds);
 
@@ -79,8 +76,7 @@ class SpotifyService {
     }
 
     const genreMap = {};
-    const allGenres = new Set(); // Track all unique genres
-
+    
     for (const chunk of chunks) {
       const response = await fetch(
         `https://api.spotify.com/v1/artists?ids=${chunk.join(',')}`,
@@ -93,37 +89,24 @@ class SpotifyService {
       const data = await response.json();
       data.artists.forEach(artist => {
         genreMap[artist.id] = artist.genres;
-        // Add all genres to our set
-        artist.genres.forEach(genre => allGenres.add(genre));
       });
     }
-
-    // Log all unique genres
-    console.log('All unique genres in playlist:', Array.from(allGenres).sort());
     
     return genreMap;
   }
 
   formatPlaylistData(items, artistGenres) {
-    console.log('Raw playlist items:', items);
-    const formatted = items.map(item => {
-      console.log('Track preview URL:', item.track.preview_url);
-      const formattedItem = {
-        id: item.track.id,
-        name: item.track.name,
-        artist: item.track.artists[0].name,
-        artistId: item.track.artists[0].id,
-        genres: artistGenres[item.track.artists[0].id] || [],
-        albumArt: item.track.album.images[0].url,
-        addedBy: item.added_by.id,
-        addedAt: item.added_at,
-        previewUrl: item.track.preview_url,
-        spotifyUrl: item.track.external_urls.spotify
-      };
-      console.log('Formatted item:', formattedItem);
-      return formattedItem;
-    });
-    return formatted;
+    return items.map(item => ({
+      id: item.track.id,
+      name: item.track.name,
+      artist: item.track.artists[0].name,
+      artistId: item.track.artists[0].id,
+      genres: artistGenres[item.track.artists[0].id] || [],
+      albumArt: item.track.album.images[0].url,
+      addedBy: item.added_by.id,
+      addedAt: item.added_at,
+      spotifyUrl: item.track.external_urls.spotify
+    }));
   }
 }
 

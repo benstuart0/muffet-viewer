@@ -8,51 +8,53 @@ const SongGrid = ({ songs, weekStart, weekEnd }) => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedArtist, setSelectedArtist] = useState(null);
 
-  console.log('SongGrid received:', { 
-    songsCount: songs.length, 
-    weekStart: weekStart.toISOString(), 
-    weekEnd: weekEnd.toISOString(),
-    firstSong: songs[0] // Log the first song to see its structure
-  });
-  // Replace these IDs with your actual Spotify user IDs
-  const members = {
-    'daamenik': 'Dom',
-    'shmizlish': 'Dana',
-    '1258022414': 'Sheng-Jie',
-    '1252565469': 'Ben'
-  };
-  
-  const getSongsForWeek = () => {
-    return Object.entries(members)
-      .map(([memberId, memberName]) => {
-        const song = songs.find(song => {
-          const addedDate = parseISO(song.addedAt);
-          return song.addedBy === memberId && 
-            isWithinInterval(addedDate, { 
-              start: startOfDay(weekStart), 
-              end: endOfDay(weekEnd) 
-            });
-        });
-        // Add memberId to create a unique combination
-        return song ? { 
-          ...song, 
-          memberName,
-          uniqueId: `${song.id}-${memberId}` // Create unique ID combining song and member
-        } : null;
-      })
-      .filter(Boolean); // Remove null entries
-  };
+  // Define preferred member order
+  const memberOrder = [
+    { id: 'daamenik', name: 'Dom' },
+    { id: '1252565469', name: 'Ben' },
+    { id: '1258022414', name: 'Sheng-Jie' },
+    { id: 'shmizlish', name: 'Dana' }
+  ];
 
-  const weekSongs = getSongsForWeek();
+  // Create members object for lookups
+  const members = memberOrder.reduce((acc, member) => {
+    acc[member.id] = member.name;
+    return acc;
+  }, {});
+
+  // Get first song per member for the week and sort by preferred member order
+  const weekSongs = songs
+    // First filter songs within the week
+    .filter(song => {
+      const addedDate = parseISO(song.addedAt);
+      return isWithinInterval(addedDate, { 
+        start: startOfDay(weekStart), 
+        end: endOfDay(weekEnd) 
+      });
+    })
+    // Group by member and take first song
+    .reduce((acc, song) => {
+      // If we haven't seen this member yet, add their first song
+      if (!acc.some(s => s.addedBy === song.addedBy)) {
+        acc.push(song);
+      }
+      return acc;
+    }, [])
+    // Sort by preferred member order
+    .sort((a, b) => {
+      const orderA = memberOrder.findIndex(m => m.id === a.addedBy);
+      const orderB = memberOrder.findIndex(m => m.id === b.addedBy);
+      return orderA - orderB;
+    });
 
   return (
     <>
       <div className="song-grid">
         {weekSongs.map(song => (
           <SongCard 
-            key={song.uniqueId}
+            key={`${song.id}-${song.addedBy}`}
             song={song}
-            member={song.memberName}
+            member={members[song.addedBy]}
             memberId={song.addedBy}
             onMemberClick={setSelectedMember}
             onArtistClick={setSelectedArtist}
