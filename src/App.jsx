@@ -50,8 +50,8 @@ function App() {
         
         <SongGrid 
           songs={songs}
-          weekStart={startOfWeek(selectedDate)}
-          weekEnd={endOfWeek(selectedDate)}
+          weekStart={startOfWeek(selectedDate, { weekStartsOn: 1 })}
+          weekEnd={endOfWeek(selectedDate, { weekStartsOn: 1 })}
         />
       </main>
     </div>
